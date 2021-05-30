@@ -169,15 +169,15 @@ namespace _3d
             allSpheres.Clear();
             bool was = false;
             var cls = (space as DumbClusterSpaceInfo).GetClusters();
-        /*    double[,] dd = new double[indexer.Points.Length, 3];
-            for (int i = 0; i < indexer.Points.Length; i++)
-            {
-                Vector3d item = indexer.Points[i];
-                dd[i, 0] = item.X;
-                dd[i, 1] = item.Y;
-                dd[i, 2] = item.Z;
-            }
-            Matrix<double> A = DenseMatrix.OfArray(dd);*/
+            /*    double[,] dd = new double[indexer.Points.Length, 3];
+                for (int i = 0; i < indexer.Points.Length; i++)
+                {
+                    Vector3d item = indexer.Points[i];
+                    dd[i, 0] = item.X;
+                    dd[i, 1] = item.Y;
+                    dd[i, 2] = item.Z;
+                }
+                Matrix<double> A = DenseMatrix.OfArray(dd);*/
 
             double[] dist_pt = new double[indexer.Points.Length];
             for (int i = 0; i < maxIterations; i++)
@@ -542,7 +542,7 @@ ss2.Stop();
                     GL.Vertex3(item);
                 }
             GL.End();
-            GL.PointSize(13);
+            GL.PointSize(psize2);
 
             GL.Color3(Color.Orange);
             GL.Begin(PrimitiveType.Points);
@@ -562,9 +562,9 @@ ss2.Stop();
             glControl.SwapBuffers();
         }
 
-        double pointsZoom = 100000;
 
         int psize = 3;
+        int psize2 = 8;
         private void timer1_Tick(object sender, EventArgs e)
         {
             glControl.Invalidate();
@@ -888,10 +888,12 @@ ss2.Stop();
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
             timer2.Enabled = !timer2.Enabled;
+            toolStripButton2.Text = timer2.Enabled ? "stop animation" : "run animation";
         }
 
         private void timer2_Tick(object sender, EventArgs e)
         {
+            if (sources.Count == 0 || currentSourceInfo == null) return;
             var index = sources.IndexOf(currentSourceInfo) + 1;
 
             if (index == sources.Count - 1)
@@ -941,7 +943,7 @@ ss2.Stop();
 
         private void button25_Click(object sender, EventArgs e)
         {
-            pin.ClusterStep = double.Parse(textBox6.Text,CultureInfo.InvariantCulture);
+            pin.ClusterStep = double.Parse(textBox6.Text, CultureInfo.InvariantCulture);
             pin.Init();
             listView3.Items.Clear();
             var array = pin.csi.GetClusters();
@@ -1078,7 +1080,7 @@ ss2.Stop();
             }
             if (checkBox4.Checked)
             {
-                for (int i = 0; i < 10000; i++)
+                for (int i = 0; i < 3000; i++)
                 {
                     vv.Add(new Vector3d((r.NextDouble() - 0.5) * 400, (r.NextDouble() - 0.5) * 400, (r.NextDouble() - 0.5) * 400));
                 }
@@ -1208,6 +1210,18 @@ ss2.Stop();
             Helpers.Remove(hlp);
             UpdateHelpersList();
             cands = null;
+        }
+
+        private void textBox7_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                psize2 = int.Parse(textBox7.Text);
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
     }
 }
