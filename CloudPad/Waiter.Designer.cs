@@ -49,7 +49,7 @@
             this.MinimizeBox = false;
             this.Name = "Waiter";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Waiter";
+            this.Text = "Please wait...";
             this.ResumeLayout(false);
 
         }

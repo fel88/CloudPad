@@ -1,6 +1,8 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace _3d
 {
@@ -32,7 +34,45 @@ namespace _3d
         {
             get { return CamUp; }
         }
+        public void FitToPoints(Vector3d[] pnts, int w, int h)
+        {
+            List<Vector2> vv = new List<Vector2>();
+            foreach (var vertex in pnts)
+            {
+                var p = MouseRay.Project(new Vector3((float)vertex.X, (float)vertex.Y, (float)vertex.Z), ProjectionMatrix, ViewMatrix, WorldMatrix, viewport);
+                vv.Add(p.Xy);
+            }
 
+            //prjs->xy coords
+            var minx = vv.Min(z => z.X);
+            var maxx = vv.Max(z => z.X);
+            var miny = vv.Min(z => z.Y);
+            var maxy = vv.Max(z => z.Y);
+
+
+            var dx = (maxx - minx);
+            var dy = (maxy - miny);
+
+            var cx = dx / 2;
+            var cy = dy / 2;
+            var dir = CamTo - CamFrom;
+            //center back to 3d
+
+            var mr = new MouseRay(cx + minx, cy + miny, this);
+            var v0 = mr.Start;
+
+            CamFrom = v0;
+            CamTo = CamFrom + dir;
+
+            var aspect = w / (float)(h);
+
+            dx /= w;
+            dx *= OrthoWidth;
+            dy /= h;
+            dy *= OrthoWidth;
+
+            OrthoWidth = Math.Max(dx, dy);
+        }
         public Matrix4 ProjectionMatrix { get; set; }
         public Matrix4 ViewMatrix { get; set; }
         public int[] viewport = new int[4];

@@ -504,7 +504,33 @@ ss2.Stop();
             GL.Vertex3(glControl.Width / 2, glControl.Height / 2, zz);
             GL.Vertex3(-glControl.Width / 2, glControl.Height, zz);
             GL.End();
+            GL.PushMatrix();
+            GL.Translate(camera1.viewport[2] / 2 - 50, -camera1.viewport[3] / 2 + 50, 0);
+            GL.Scale(0.5, 0.5, 0.5);
 
+            var mtr = camera1.ViewMatrix;
+            var q = mtr.ExtractRotation();
+            var mtr3 = Matrix4.CreateFromQuaternion(q);
+            GL.MultMatrix(ref mtr3);
+            GL.LineWidth(2);
+            GL.Color3(Color.Red);
+            GL.Begin(PrimitiveType.Lines);
+            GL.Vertex3(0, 0, 0);
+            GL.Vertex3(100, 0, 0);
+            GL.End();
+
+            GL.Color3(Color.Green);
+            GL.Begin(PrimitiveType.Lines);
+            GL.Vertex3(0, 0, 0);
+            GL.Vertex3(0, 100, 0);
+            GL.End();
+
+            GL.Color3(Color.Blue);
+            GL.Begin(PrimitiveType.Lines);
+            GL.Vertex3(0, 0, 0);
+            GL.Vertex3(0, 0, 100);
+            GL.End();
+            GL.PopMatrix();
             camera1.Setup(glControl);
 
             GL.LineWidth(2);
@@ -563,8 +589,8 @@ ss2.Stop();
         }
 
 
-        int psize = 3;
-        int psize2 = 8;
+        float psize = 3;
+        float psize2 = 8;
         private void timer1_Tick(object sender, EventArgs e)
         {
             glControl.Invalidate();
@@ -894,7 +920,7 @@ ss2.Stop();
         private void timer2_Tick(object sender, EventArgs e)
         {
             if (sources.Count == 0 || currentSourceInfo == null) return;
-            var index = sources.IndexOf(currentSourceInfo) + 1;
+            var index = sources.IndexOf(currentSourceInfo);
 
             if (index == sources.Count - 1)
             {
@@ -902,8 +928,14 @@ ss2.Stop();
                 {
                     index = 0;
                 }
-                else { timer2.Enabled = false; return; }
+                else
+                {
+                    timer2.Enabled = false;
+                    toolStripButton2.Text = "run animation";
+                    return;
+                }
             }
+            index++;
             LoadSource(sources[index]);
         }
 
@@ -1100,7 +1132,7 @@ ss2.Stop();
         {
             try
             {
-                psize = int.Parse(textBox4.Text);
+                psize = float.Parse(textBox4.Text.Replace(",","."), CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -1129,6 +1161,7 @@ ss2.Stop();
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "PLY files (*.ply)|*.ply";
             ofd.Multiselect = true;
 
             if (ofd.ShowDialog() == DialogResult.OK)
@@ -1182,7 +1215,7 @@ ss2.Stop();
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "ply files (*.ply)|*.ply";
+            sfd.Filter = "PLY files (*.ply)|*.ply";
             if (sfd.ShowDialog() == DialogResult.OK)
             {
                 PlyLoader.SavePly(sfd.FileName, currentSourceInfo.Data.Points.ToArray(), currentSourceInfo.colors);
@@ -1214,14 +1247,26 @@ ss2.Stop();
 
         private void textBox7_TextChanged(object sender, EventArgs e)
         {
-            try
+            try                
             {
-                psize2 = int.Parse(textBox7.Text);
+                psize2 = int.Parse(textBox7.Text.Replace(",", "."), CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
 
             }
+        }
+
+        private void toolStripButton1_Click_1(object sender, EventArgs e)
+        {
+            List<Vector3d> pp = new List<Vector3d>();
+            if (currentSourceInfo != null)
+                for (int i = 0; i < pin.Points.Length; i++)
+                {
+                    pp.Add(pin.Points[i]);
+                }
+            if (pp.Count == 0) return;
+            camera1.FitToPoints(pp.ToArray(), glControl.Width, glControl.Height);
         }
     }
 }

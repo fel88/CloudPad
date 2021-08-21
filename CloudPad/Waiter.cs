@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace _3d
@@ -18,6 +13,14 @@ namespace _3d
             Shown += Waiter_Shown;
         }
 
+        public string Title
+        {
+            get { return Text; }
+            set
+            {
+                Text = value;
+            }
+        }
         private void Waiter_Shown(object sender, EventArgs e)
         {
             bw.RunWorkerAsync();
